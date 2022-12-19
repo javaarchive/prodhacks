@@ -1,0 +1,47 @@
+{
+  "name": "Productivity Hacks",
+  "description": "mostly shortcuts for stuff.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "omnibox": { "keyword" : "prod" },
+  "action": {
+    "default_icon": {
+      "16": "logo16.png",
+      "32": "logo32.png"
+    },
+    "default_popup": "src/options.html"
+  },
+  "options_ui": {
+    "page": "src/options.html"
+  },
+  "icons": {
+    "16": "logo16.png",
+    "32": "logo32.png",
+    "48": "logo48.png",
+    "128": "logo128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "contextMenus",
+    "storage",
+    "unlimitedStorage"
+  ],"web_accessible_resources": [{
+    "matches": ["<all_urls>"],
+    "resources": ["src/main_content.js","src/shared.js"]
+  }],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+        "matches": ["<all_urls>"],
+        "js": ["src/main_content_script_loader.js"]
+    }
+  ],
+  "minimum_chrome_version": "92"
+}
