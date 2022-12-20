@@ -17,7 +17,7 @@ export async function getConfigOptions(sections = []){
 
 export async function loadConfig(sections = ALL_SECTIONS){
     config = Object.assign(config,await getConfigOptions(sections));
-    console.log("Config loaded: ", config);
+    console.log("Config Loaded: ", config);
 }
 
 export async function syncConfigSection(section = "main"){
@@ -36,4 +36,91 @@ export async function loadNormal(){
     await loadConfig();
 }
 
+export function emit(ev, data){
+    chrome.runtime.sendMessage({event: ev, data});
+}
+
+export function on(ev, callback){
+    chrome.runtime.onMessage.addListener((msg) => {
+        if(msg.event == ev){
+            callback(msg.data);
+        }
+    });
+}
+
+async function queryAllDiscord(){
+    let discordTabs = [];
+    discordTabs = discordTabs.concat((await chrome.tabs.query({url: "https://discord.com/*"})) || []);
+    discordTabs = discordTabs.concat((await chrome.tabs.query({url: "https://canary.discord.com/*"})) || []);
+    discordTabs = discordTabs.concat((await chrome.tabs.query({url: "https://ptb.discord.com/*"})) || []);
+    return discordTabs;
+}
+
+/** @type {(import("./interfaces").Macro)[]} */
+export const macros = [
+    {
+        title: "Hide Discord",
+        id: "discord.hide",
+        action: async () => {
+            const tabs = await queryAllDiscord();
+            for(let tab of tabs){
+                await chrome.tabs.update(tab.id, {
+                    muted: true,
+                    pinned: true
+                })
+            }
+        }
+    },
+    {
+        title: "Show Discord",
+        id: "discord.show",
+        action: async () => {
+            const tabs = await queryAllDiscord();
+            for(let tab of tabs){
+                await chrome.tabs.update(tab.id, {
+                    muted: false,
+                    pinned: false
+                })
+            }
+        }
+    },
+    {
+        title: "Kill Discord",
+        id: "discord.kill",
+        action: async () => {
+            const tabs = await queryAllDiscord();
+            for(let tab of tabs){
+                await chrome.tabs.remove(tab.id);
+            }
+        }
+    },{
+        title: "Focus Discord",
+        id: "discord.focus",
+        action: async () => {
+            const tabs = await queryAllDiscord();
+            chrome.tabs.update(tabs[0].id, {
+                active: true
+            });
+        }
+    },{
+        title: "Toggle Time Management Stopwatch Tabs",
+        id: "time_management.toggle_stopwatch_tabs",
+        action: async () => {
+            config.time_management.stopwatch_tabs = !config.time_management.stopwatch_tabs;
+            await syncConfigSection("time_management");
+            const message = "Stopwatch Tabs is now " + (config.time_management.stopwatch_tabs ? "Enabled" : "Disabled");
+            await chrome.notifications.create("time_mangement_stopwatch_tabs",{
+                type: "basic",
+                title: "Time Management",
+                message: message,
+                iconUrl: "/logo128.png"
+            });
+        }
+    }
+]
+
 console.log("Share library loaded");
+
+setInterval(() => {
+    syncConfigSections();
+}, 30 * 1000);

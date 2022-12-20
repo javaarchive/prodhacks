@@ -1,0 +1,12 @@
+{
+    "include": [
+		"src/*.js"
+, "src/interfaces.d.ts"	],
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "checkJs": true,
+        "typeRoots": [ "node_modules/@types" ],
+        "types": [ "browser", "@types/chrome"],
+        "lib": ["DOM","ESNext","ES5","ES6","ES7"]
+    }
+}

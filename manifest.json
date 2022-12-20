@@ -29,7 +29,9 @@
     "scripting",
     "contextMenus",
     "storage",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "tabs",
+    "notifications"
   ],"web_accessible_resources": [{
     "matches": ["<all_urls>"],
     "resources": ["src/main_content.js","src/shared.js"]
