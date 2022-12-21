@@ -41,9 +41,9 @@ export function emit(ev, data){
 }
 
 export function on(ev, callback){
-    chrome.runtime.onMessage.addListener((msg) => {
+    chrome.runtime.onMessage.addListener((msg, sender, respond) => {
         if(msg.event == ev){
-            callback(msg.data);
+            callback(sender, respond, msg.data);
         }
     });
 }
@@ -112,6 +112,20 @@ export const macros = [
             await chrome.notifications.create("time_mangement_stopwatch_tabs",{
                 type: "basic",
                 title: "Time Management",
+                message: message,
+                iconUrl: "/logo128.png"
+            });
+        }
+    },{
+        title: "Toggle Bomb Tabs",
+        id: "time_management.toggle_bomb_tabs",
+        action: async () => {
+            config.time_management.bomb_tabs = !config.time_management.bomb_tabs;
+            await syncConfigSection("time_management");
+            const message = "BOMB Tabs is now " + (config.time_management.bomb_tabs ? "Enabled. You are safe! " : "Disabled. New tabs will autoclose when their timer reaches 0. ");
+            await chrome.notifications.create("time_mangement_stopwatch_tabs",{
+                type: "basic",
+                title: "Bomb Tabs Alert",
                 message: message,
                 iconUrl: "/logo128.png"
             });

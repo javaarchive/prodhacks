@@ -27,5 +27,11 @@ chrome.omnibox.onInputChanged.addListener((text, doSuggest) => {
 });
 
 prodExt.loadNormal().then(_ => {
+  prodExt.on("closetab", (sender, respond, data) => {
+    chrome.tabs.remove(sender.tab.id);
+  });
 
+  prodExt.on("bomb_ignite", (sender, respond, data) => {
+    chrome.tabs.remove(sender.tab.id);
+  });
 });
